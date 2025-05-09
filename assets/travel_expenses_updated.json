@@ -1,0 +1,107 @@
+{
+    "tripInfo": {
+        "title": "알취사들의 안성 촌캉스",
+        "totalSpent": 747870
+    },
+    "participants": ["승경","천소연","다히","정유","김동"],
+    "expenses": [
+        {
+            "category": "보험",
+            "amount": 12000,
+            "paidBy": ["유선"],
+            "included": ["천소연","승경","다히", "유선"],
+            "order": 1
+        },
+        {
+            "category": "숙박",
+            "amount": 455000,
+            "paidBy": ["천소연","승경", "유선", "다히", "김동"],
+            "included": ["천소연","승경", "유선", "다히", "김동"],
+            "order": 2
+        },
+        {
+            "category": "트레이더스",
+            "amount": 127220,
+            "paidBy": ["유선"],
+            "included": ["천소연","승경","다히", "김동", "유선"],
+            "order": 3
+        },
+        {
+            "category": "다이소",
+            "amount": 11000,
+            "paidBy": ["유선"],
+            "included": ["천소연","승경","다히", "김동", "유선"],
+            "order": 4
+        },
+        {
+            "category": "와인",
+            "amount": 37900,
+            "paidBy": ["천소연"],
+            "included": ["천소연","승경","다히", "김동", "유선"],
+            "order": 5
+        },
+        {
+            "category": "스타벅스",
+            "amount": 4500,
+            "paidBy": ["승경"],
+            "included": ["다히"],
+            "order": 6
+        },
+        {
+            "category": "스타벅스",
+            "amount": 4700,
+            "paidBy": ["승경"],
+            "included": ["다히","승경"],
+            "order": 7
+        },
+        {
+            "category": "스타벅스",
+            "amount": 6300,
+            "paidBy": ["승경"],
+            "included": ["다히","승경"],
+            "order": 8
+        },
+        {
+            "category": "스타벅스",
+            "amount": 5500,
+            "paidBy": ["승경"],
+            "included": ["승경"],
+            "order": 9
+        },
+        {
+            "category": "이마트",
+            "amount": 10900,
+            "paidBy": ["천소연"],
+            "included": ["천소연","승경","다히", "김동", "유선"],
+            "order": 10
+        },
+        {
+            "category": "노브랜드",
+            "amount": 11550,
+            "paidBy": ["천소연"],
+            "included": ["천소연","승경","다히", "김동", "유선"],
+            "order": 11
+        },
+        {
+            "category": "닭강정",
+            "amount": 8400,
+            "paidBy": ["승경"],
+            "included": ["천소연","승경"],
+            "order": 12
+        },
+        {
+            "category": "다이소",
+            "amount": 2000,
+            "paidBy": ["천소연"],
+            "included": ["천소연","승경","다히", "김동", "유선"],
+            "order": 13
+        },
+        {
+            "category": "빵",
+            "amount": 50900,
+            "paidBy": ["승경"],
+            "included": ["천소연","승경","다히", "김동", "유선"],
+            "order": 14
+        }
+    ]
+}
