@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'service/get_json_service.dart';
 import 'views/list_page.dart';
+import 'views/detail_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,14 +22,16 @@ class MyApp extends StatelessWidget {
               foregroundColor: Colors.white
           )
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => ListPage(jsonService: jsonService),
-        // '/addSchedule': (context) => AddSchedulePage(),
-        // '/Detail/:id': (context) => DetailPage(),
-        // '/addExpense/:tripId': (context) => AddExpensePage(),
-        // '/settlement/:tripId': (context) => SettlementPage(),
-      },
+      home: ListPage(jsonService: jsonService),
+      // 아래는 책에서 참고
+      // initialRoute: '/',
+      // routes: {
+      //   '/': (context) => ListPage(jsonService: jsonService),
+      //   // '/addSchedule': (context) => AddSchedulePage(),
+      //   // '/Detail/:id': (context) => DetailPage(),
+      //   // '/addExpense/:tripId': (context) => AddExpensePage(),
+      //   // '/settlement/:tripId': (context) => SettlementPage(),
+      // },
     );
   }
 }

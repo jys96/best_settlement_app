@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/schedule.dart';
 import '../service/get_json_service.dart';
+import 'detail_page.dart';
 
 class ListPage extends StatelessWidget {
   final JsonService jsonService;
@@ -34,6 +35,12 @@ class ListPage extends StatelessWidget {
                     subtitle: Text('총 사용 금액: ₩${value.totalSpent}'),
                     onTap: () {
                       // 클릭 시 상세 페이지로 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailPage(datas: value),
+                        ),
+                      );
                     },
                   ),
                 );
