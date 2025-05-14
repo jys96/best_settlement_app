@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/schedule.dart';
 import 'add_expense_page.dart';
+import 'settlement_page.dart';
 
 class DetailPage extends StatefulWidget {
   final ScheduleModel datas;
@@ -36,6 +37,22 @@ class _DetailPageState extends State<DetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.datas.title),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettlementPage(schedule: widget.datas),
+                ),
+              );
+            },
+            child: Text(
+              "정산 결과 보기",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
