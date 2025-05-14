@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/schedule.dart';
 import '../service/get_json_service.dart';
 import 'detail_page.dart';
+import 'add_schedule_page.dart';
 
 class ListPage extends StatelessWidget {
   final JsonService jsonService;
@@ -24,27 +25,44 @@ class ListPage extends StatelessWidget {
             return Center(child: Text('데이터가 없습니다.'));
           } else {
             final datas = data.data!;
-            return ListView.builder(
-              itemCount: datas.length,
-              itemBuilder: (context, index) {
-                final value = datas[index];
-                return Card(
-                  color: Colors.white,
-                  child: ListTile(
-                    title: Text(value.title),
-                    subtitle: Text('총 사용 금액: ₩${value.totalSpent}'),
-                    onTap: () {
-                      // 클릭 시 상세 페이지로 이동
+            return Stack(
+              children: [
+                ListView.builder(
+                  itemCount: datas.length,
+                  itemBuilder: (context, index) {
+                    final value = datas[index];
+                    return Card(
+                      color: Colors.white,
+                      child: ListTile(
+                        title: Text(value.title),
+                        subtitle: Text('총 사용 금액: ₩${value.totalSpent}'),
+                        onTap: () {
+                          // 클릭 시 상세 페이지로 이동
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailPage(datas: value),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+                Positioned(
+                  bottom: 20,
+                  right: 20,
+                  child: FloatingActionButton(
+                    onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailPage(datas: value),
-                        ),
+                        MaterialPageRoute(builder: (context) => AddSchedulePage()),
                       );
                     },
-                  ),
-                );
-              },
+                    child: Icon(Icons.add),
+                  )
+                )
+              ]
             );
           }
         },
