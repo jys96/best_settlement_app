@@ -13,8 +13,8 @@ class ScheduleModel {
     required this.expenses,
   });
 
-  /// JSON 데이터를 ScheduleModel 객체로 매핑
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {
+
     return ScheduleModel(
       title: json['scheduleInfo']['title'],
       totalSpent: json['scheduleInfo']['totalSpent'],

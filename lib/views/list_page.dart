@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/schedule.dart';
 import '../service/get_json_service.dart';
-import '../models/schedule_data.dart';
 
 class ListPage extends StatelessWidget {
   final JsonService jsonService;
@@ -9,39 +9,38 @@ class ListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('일정 목록')),
-      body: FutureBuilder(
-        future: jsonService.loadScheduleData('assets/travel_expenses_updated.json'),
-        builder: (context, value) {
-          if (value.connectionState == ConnectionState.waiting) {
+      appBar: AppBar(
+        title: Text("여행 일정 목록"),
+      ),
+      body: FutureBuilder<List<ScheduleModel>>(
+        future: jsonService.loadSchedules('assets/travel_expenses_updated.json'),
+        builder: (context, data) {
+          if (data.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
-          } else if (value.hasError) {
+          } else if (data.hasError) {
             return Center(child: Text('데이터를 불러오는 중 오류가 발생했습니다.'));
-          } else if (!value.hasData) {
+          } else if (!data.hasData) {
             return Center(child: Text('데이터가 없습니다.'));
           } else {
-            final datas = value.data!;
-
-            return ListView.separated(
-              itemCount: 1, // 임시
+            final datas = data.data!;
+            return ListView.builder(
+              itemCount: datas.length,
               itemBuilder: (context, index) {
-                final info = datas.scheduleInfo;
-
-                return ListTile(
-                  // leading: CircleAvatar(radius: 25, backgroundColor: Colors.purple),
-                  title: Text(info.title),
-                  subtitle: Text('${info.totalSpent}'),
-                  onTap: () {
-                    final data = datas.expenses;
-                    print('on TAP!! ${data}');
-                    // Navigator.pushNamed(context, '/Detail/$index'); // 상세 페이지로 이동
-                  },
+                final value = datas[index];
+                return Card(
+                  color: Colors.white,
+                  child: ListTile(
+                    title: Text(value.title),
+                    subtitle: Text('총 사용 금액: ₩${value.totalSpent}'),
+                    onTap: () {
+                      // 클릭 시 상세 페이지로 이동
+                    },
+                  ),
                 );
               },
-              separatorBuilder: (BuildContext context, int index) => const Divider(),
             );
           }
-        }
+        },
       ),
     );
   }
