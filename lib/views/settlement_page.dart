@@ -1,90 +1,83 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/schedule.dart';
-import '../service/settlement_calculator_service.dart';
+import 'dart:math';
+import '../service/format.dart';
+
+List<String> settlementTexts = [];  // 공유용 텍스트는 외부에서 따로 관리
 
 class SettlementPage extends StatelessWidget {
   final ScheduleModel datas;
   const SettlementPage({Key? key, required this.datas}) : super(key: key);
 
-  /// 각 참여자의 정산 금액 계산
-  Map<String, int> calculateBalances() {
-    Map<String, int> balances = {for (var p in datas.participants) p: 0};
+  calculate() {
+    settlementTexts.clear(); // 기존 공유용 텍스트 초기화
+
+    // 1. 참여자별로 총 지출 계산
+    Map<String, int> totalSpent = {for (var p in datas.participants) p: 0};
+
     for (var expense in datas.expenses) {
       int splitAmount = (expense.amount / expense.included.length).round();
-      // 금액 지불자 빼기
+      for (var person in expense.included) {
+        totalSpent[person] = (totalSpent[person] ?? 0) - splitAmount;
+      }
       for (var payer in expense.paidBy) {
-        balances[payer] = (balances[payer] ?? 0) + expense.amount;
-      }
-
-      // 각 포함된 사람에게 금액 나누기
-      for (var included in expense.included) {
-        balances[included] = (balances[included] ?? 0) - splitAmount;
-      }
-    }
-    return balances;
-  }
-
-  testfunc() {
-    final balance = {for (var p in datas.participants) p: 0.0};
-    print(datas.expenses.toString());
-    // 1. 각 항목마다 개인별 부담 계산
-    for (var expense in datas.expenses) {
-    // print(expense.toString());
-      final share = expense.amount / expense.included.length;
-      for (var user in expense.included) {
-        balance[user] = balance[user]! - share;
-      }
-      // balance[expense.payer] = balance[expense.payer]! + expense.amount;
-      for (var payer in expense.paidBy) {
-        balance[payer] = (balance[payer] ?? 0) + expense.amount;
+        totalSpent[payer] = (totalSpent[payer] ?? 0) + expense.amount ~/ expense.paidBy.length;
       }
     }
 
-    print('test 1 => ${balance}');
+    // 2. Positive(더 낸 사람)과 Negative(덜 낸 사람) 나누기
+    List<MapEntry<String, int>> positive = [];
+    List<MapEntry<String, int>> negative = [];
 
-    // 2. 정산 로직
-    final payers = <Map<String, dynamic>>[];
-    final receivers = <Map<String, dynamic>>[];
-
-    balance.forEach((person, amount) {
-      if (amount < 0) {
-        payers.add({"person": person, "amount": -amount});
-      } else if (amount > 0) {
-        receivers.add({"person": person, "amount": amount});
+    totalSpent.forEach((key, value) {
+      if (value > 0) {
+        positive.add(MapEntry(key, value));
+      } else if (value < 0) {
+        negative.add(MapEntry(key, -value));
       }
     });
 
-    print('test 2 => ${payers}');
-    print('test 2 => ${receivers}');
+    // 금액 순으로 정렬
+    positive.sort((a, b) => b.value.compareTo(a.value));
+    negative.sort((a, b) => b.value.compareTo(a.value));
 
-    // 3. 최소 거래 매칭
-    final transactions = <String>[];
-    for (var payer in payers) {
-      while (payer["amount"] > 0) {
-        final receiver = receivers.firstWhere((r) => r["amount"] > 0);
-        final transfer = (payer["amount"] < receiver["amount"]) ? payer["amount"] : receiver["amount"];
+    // 3. 최소 거래 계산
+    List<Widget> settlementWidgets = [];
 
-        transactions.add("${payer["person"]} -> ${receiver["person"]} : ${transfer.toStringAsFixed(0)}원");
+    int i = 0, j = 0;
 
-        payer["amount"] -= transfer;
-        receiver["amount"] -= transfer;
-      }
+    while (i < positive.length && j < negative.length) {
+      int amount = min(positive[i].value, negative[j].value);
+
+      // 공유용 텍스트
+      settlementTexts.add("${negative[j].key} → ${positive[i].key} : ${formatCurrency(amount)}");
+
+      positive[i] = MapEntry(positive[i].key, positive[i].value - amount);
+      negative[j] = MapEntry(negative[j].key, negative[j].value - amount);
+
+      // 화면 노출용 위젯
+      settlementWidgets.add(
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text("${negative[j].key} "),
+              Icon(Icons.arrow_right_alt, size: 30, color: Colors.blueAccent),
+              Text(" ${positive[i].key} : ${formatCurrency(amount)}")
+            ],
+          )
+      );
+
+      if (positive[i].value == 0) i++;
+      if (negative[j].value == 0) j++;
     }
 
-    print('test 3 => ${transactions}');
-
-    // 4. 결과 출력
-    transactions.forEach(print);
+    return(settlementWidgets);
   }
 
   @override
   Widget build(BuildContext context) {
-    final balances = calculateBalances();
-    final settlements = calculateSettlement(balances);
-    testfunc();
+    final settlements = calculate();
 
     return Scaffold(
       appBar: AppBar(
