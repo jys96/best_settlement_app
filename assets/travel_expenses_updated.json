@@ -5,7 +5,7 @@
                 "title": "알취사들의 안성 촌캉스",
                 "totalSpent": 747870
             },
-            "participants": ["승경","천소연","다히","정유","김동"],
+            "participants": ["승경","천소연","다히","유선","김동"],
             "expenses": [
                 {
                     "category": "보험",
@@ -110,30 +110,37 @@
         {
             "scheduleInfo": {
                 "title": "백조들의 한강 나들이",
-                "totalSpent": 90000
+                "totalSpent": 74400
             },
             "participants": ["유선","수영", "혜진"],
             "expenses": [
                 {
-                    "category": "텐트 예약",
-                    "amount": 30000,
+                    "category": "돗자리 세트",
+                    "amount": 17000,
                     "paidBy": ["혜진"],
                     "included": ["유선","수영", "혜진"],
                     "order": 1
                 },
                 {
-                    "category": "배달",
-                    "amount": 52000,
+                    "category": "점심 배달",
+                    "amount": 39700,
                     "paidBy": ["혜진"],
                     "included": ["유선","수영", "혜진"],
                     "order": 2
                 },
                 {
-                    "category": "음료",
-                    "amount": 8000,
+                    "category": "편의점",
+                    "amount": 13200,
                     "paidBy": ["혜진"],
                     "included": ["유선","수영", "혜진"],
                     "order": 3
+                },
+                {
+                    "category": "카페",
+                    "amount": 4500,
+                    "paidBy": ["혜진"],
+                    "included": ["수영"],
+                    "order": 4
                 }
             ]
         }
