@@ -13,6 +13,11 @@ class ExpenseModel {
     required this.order,
   });
 
+  @override
+  String toString() {
+    return 'expense(category: $category, amount: $amount, paidBy: $paidBy, included: $included, order: $order)';
+  }
+
   /// JSON 데이터를 ExpenseModel 객체로 매핑
   factory ExpenseModel.fromJson(Map<String, dynamic> json) {
     return ExpenseModel(

@@ -13,6 +13,11 @@ class ScheduleModel {
     required this.expenses,
   });
 
+  @override
+  String toString() {
+    return 'schedule(title: $title, totalSpent: $totalSpent, participants: $participants, expenses: $expenses)';
+  }
+
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {
 
     return ScheduleModel(

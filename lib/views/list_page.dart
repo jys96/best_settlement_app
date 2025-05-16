@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/schedule.dart';
 import '../service/get_json_service.dart';
+import '../service/format.dart';
 import 'detail_page.dart';
 import 'add_schedule_page.dart';
 
@@ -35,7 +36,7 @@ class ListPage extends StatelessWidget {
                       color: Colors.white,
                       child: ListTile(
                         title: Text(value.title),
-                        subtitle: Text('총 사용 금액: ₩${value.totalSpent}'),
+                        subtitle: Text('총 사용 금액: ${formatCurrency(value.totalSpent)}'),
                         onTap: () {
                           // 클릭 시 상세 페이지로 이동
                           Navigator.push(
@@ -59,7 +60,7 @@ class ListPage extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => AddSchedulePage()),
                       );
                     },
-                    child: Icon(Icons.add),
+                    child: Icon(Icons.format_list_bulleted_add, size: 36,),
                   )
                 )
               ]

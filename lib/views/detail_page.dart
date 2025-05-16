@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/schedule.dart';
 import 'add_expense_page.dart';
 import 'settlement_page.dart';
+import '../service/format.dart';
 
 class DetailPage extends StatefulWidget {
   final ScheduleModel datas;
@@ -43,13 +44,13 @@ class _DetailPageState extends State<DetailPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SettlementPage(schedule: widget.datas),
+                  builder: (context) => SettlementPage(datas: widget.datas),
                 ),
               );
             },
             child: Text(
               "정산 결과 보기",
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.purple),
             ),
           ),
         ],
@@ -61,7 +62,7 @@ class _DetailPageState extends State<DetailPage> {
             child: Column(
               children: [
                 Text(
-                  "총 사용 금액: ₩${widget.datas.totalSpent}",
+                  "총 사용 금액: ${formatCurrency(widget.datas.totalSpent)}",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
@@ -73,6 +74,7 @@ class _DetailPageState extends State<DetailPage> {
             ),
           ),
           Divider(),
+          SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
               itemCount: expenses.length,
@@ -83,12 +85,12 @@ class _DetailPageState extends State<DetailPage> {
                   margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   child: ListTile(
                     title: Text(expense['category']),
-                    subtitle: Text('금액: ₩${expense['amount']}'),
+                    subtitle: Text('금액: ${formatCurrency(expense['amount'])}'),
                     // trailing: Text('참여: ${expense['included'].join(", ")}'),
                     trailing: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text('지불자: ${expense['paidBy'].join(", ")}'),
+                        Text('결제: ${expense['paidBy'].join(", ")}'),
                         Text('참여: ${expense['included'].join(", ")}'),
                       ],
                     ),
@@ -113,7 +115,7 @@ class _DetailPageState extends State<DetailPage> {
             ),
           );
         },
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, size: 40,),
       ),
     );
   }
