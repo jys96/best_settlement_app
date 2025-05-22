@@ -1,32 +1,58 @@
-import 'expense.dart';
+import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
+part 'schedule.g.dart';
+
+@HiveType(typeId: 0)
 class ScheduleModel {
+  @HiveField(0)
+  final String id;
+
+  @HiveField(1)
   final String title;
-  final int totalSpent;
+
+  @HiveField(2)
+  final int totalExpense;
+
+  @HiveField(3)
+  final String date;
+
+  @HiveField(4)
   final List<String> participants;
-  final List<ExpenseModel> expenses;
 
   ScheduleModel({
+    required this.id,
     required this.title,
-    required this.totalSpent,
+    required this.totalExpense,
+    required this.date,
     required this.participants,
-    required this.expenses,
   });
 
   @override
   String toString() {
-    return 'schedule(title: $title, totalSpent: $totalSpent, participants: $participants, expenses: $expenses)';
+    return 'schedule(id: $id, title: $title, totalSpent: $totalExpense, date: $date, participants: $participants)';
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'totalExpense': totalExpense,
+      'date': date,
+      'participants': participants,
+    };
+  }
+
+  /// JSON 데이터를 ExpenseModel 객체로 매핑
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {
+    final uuid = Uuid();
 
     return ScheduleModel(
+      id: uuid.v4(),
       title: json['scheduleInfo']['title'],
-      totalSpent: json['scheduleInfo']['totalSpent'],
+      totalExpense: json['scheduleInfo']['totalSpent'],
+      date: json['scheduleInfo']['date'] ?? '-',
       participants: List<String>.from(json['participants']),
-      expenses: (json['expenses'] as List)
-          .map((e) => ExpenseModel.fromJson(e))
-          .toList(),
     );
   }
 }
