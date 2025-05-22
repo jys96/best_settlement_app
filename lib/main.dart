@@ -1,14 +1,53 @@
 import 'package:flutter/material.dart';
-import 'service/get_json_service.dart';
-import 'views/list_page.dart';
-import 'views/detail_page.dart';
+import 'package:provider/provider.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
-  runApp(MyApp());
+import 'models/schedule.dart';
+import 'models/expense.dart';
+
+import 'viewmodels/schedule_viewmodel.dart';
+import 'viewmodels/expense_viewmodel.dart';
+
+import 'views/list_page.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Hive 초기화
+  final dir = await getApplicationDocumentsDirectory();
+  Hive.init(dir.path);
+
+  // Hive 어댑터 등록
+  Hive.registerAdapter(ScheduleModelAdapter());
+  Hive.registerAdapter(ExpenseModelAdapter());
+
+  /// hive 데이터의 문제로 json데이터를 다시 저장해야하는 경우에만 주석 해제
+  // 기존 데이터 삭제 (개발 중 임시 처리)
+  // await Hive.deleteBoxFromDisk('schedules');
+  // await Hive.deleteBoxFromDisk('expenses');
+
+  // Box 열기
+  await Hive.openBox<ScheduleModel>('schedules');
+  await Hive.openBox<ExpenseModel>('expenses');
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => ScheduleViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ExpenseViewModel(),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  final JsonService jsonService = JsonService();
 
   @override
   Widget build(BuildContext context) {
@@ -22,16 +61,7 @@ class MyApp extends StatelessWidget {
               foregroundColor: Colors.white
           )
       ),
-      home: ListPage(jsonService: jsonService),
-      // 아래는 책에서 참고
-      // initialRoute: '/',
-      // routes: {
-      //   '/': (context) => ListPage(jsonService: jsonService),
-      //   // '/addSchedule': (context) => AddSchedulePage(),
-      //   // '/Detail/:id': (context) => DetailPage(),
-      //   // '/addExpense/:tripId': (context) => AddExpensePage(),
-      //   // '/settlement/:tripId': (context) => SettlementPage(),
-      // },
+      home: ListPage()
     );
   }
 }

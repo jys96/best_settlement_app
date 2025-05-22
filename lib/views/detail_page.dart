@@ -1,32 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../models/schedule.dart';
-import 'add_expense_page.dart';
-import 'settlement_page.dart';
 import '../service/format.dart';
 
+import '../viewmodels/expense_viewmodel.dart';
+
+import 'add_expense_page.dart';
+import 'settlement_page.dart';
+
 class DetailPage extends StatefulWidget {
-  final ScheduleModel datas;
-  const DetailPage({Key? key, required this.datas}) : super(key: key);
+  final ScheduleModel schedule;
+  const DetailPage({Key? key, required this.schedule}) : super(key: key);
 
   @override
   _DetailPageState createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
+  late ExpenseViewModel expenseViewModel;
+
   List<Map<String, dynamic>> expenses = [];
 
-  @override
-  void initState() {
-    super.initState();
-    expenses = widget.datas.expenses.map((e) => {
-      "category": e.category,
-      "amount": e.amount,
-      "paidBy": e.paidBy,
-      "included": e.included,
-      "order": e.order,
-    }).toList();
-  }
-
+  /// TODO : 지출 항목 추가 작업
+  // 지출 항목 추가 이벤트
   void _addExpense(Map<String, dynamic> expense) {
     setState(() {
       expenses.add(Map<String, Object>.from(expense));
@@ -34,17 +31,27 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    expenseViewModel = context.read<ExpenseViewModel>();
+    expenseViewModel.openBox(); // Hive 박스 오픈 및 초기 데이터 로드
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final scheduleId = widget.schedule.id;
+    print('[detail page] schedule ID => ${scheduleId}');
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.datas.title),
+        title: Text(widget.schedule.title),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SettlementPage(datas: widget.datas),
+                  builder: (context) => SettlementPage(datas: widget.schedule),
                 ),
               );
             },
@@ -62,12 +69,12 @@ class _DetailPageState extends State<DetailPage> {
             child: Column(
               children: [
                 Text(
-                  "총 사용 금액: ${formatCurrency(widget.datas.totalSpent)}",
+                  "총 사용 금액: ${formatCurrency(widget.schedule.totalExpense)}",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "참여자: ${widget.datas.participants.join(', ')}",
+                  "참여자: ${widget.schedule.participants.join(', ')}",
                   style: TextStyle(fontSize: 12),
                 ),
               ],
@@ -75,48 +82,60 @@ class _DetailPageState extends State<DetailPage> {
           ),
           Divider(),
           SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              itemCount: expenses.length,
-              itemBuilder: (context, index) {
-                final expense = expenses[index];
-                return Card(
-                  color: Colors.white,
-                  margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  child: ListTile(
-                    title: Text(expense['category']),
-                    subtitle: Text('금액: ${formatCurrency(expense['amount'])}'),
-                    // trailing: Text('참여: ${expense['included'].join(", ")}'),
-                    trailing: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text('결제: ${expense['paidBy'].join(", ")}'),
-                        Text('참여: ${expense['included'].join(", ")}'),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+          Consumer<ExpenseViewModel>(
+            builder: (context, vm, child) {
+              // 지출 항목을 추가할 수 있으므로 전역 변수에 지출내역 저장
+              expenses = vm.getExpensesBySchedule(scheduleId).map((e) => e.toJson()).toList();
+              // print('[detail page] expenses => ${expenses}');
+
+              if (expenses.isEmpty) {
+                return const Center(child: Text('저장된 지출 항목이 없습니다.'));
+              }
+
+              return Expanded(
+                child: ListView.builder(
+                  itemCount: expenses.length,
+                  itemBuilder: (context, index) {
+                    final expense = expenses[index];
+
+                    return Card(
+                      color: Colors.white,
+                      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      child: ListTile(
+                        title: Text(expense['title']),
+                        subtitle: Text('금액: ${formatCurrency(expense['amount'])}'),
+                        trailing: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text('결제: ${expense['paidBy'].join(", ")}'),
+                            Text('참여: ${expense['included'].join(", ")}'),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (context) => FractionallySizedBox(
-              heightFactor: 0.9,
-              child:  AddExpensePage(
-                participants: widget.datas.participants,
-                onAddExpense: _addExpense,
-              )
-            ),
-          );
-        },
-        child: Icon(Icons.add, size: 40,),
-      ),
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: () async {
+          //     await showModalBottomSheet(
+          //       context: context,
+          //       isScrollControlled: true,
+          //       builder: (context) => FractionallySizedBox(
+          //         heightFactor: 0.9,
+          //         child:  AddExpensePage(
+          //           participants: widget.datas.participants,
+          //           onAddExpense: _addExpense,
+          //         )
+          //       ),
+          //     );
+          //   },
+          //   child: Icon(Icons.add, size: 40,),
+          // ),
+        ]
+      )
     );
   }
 }

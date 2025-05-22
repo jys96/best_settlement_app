@@ -16,15 +16,15 @@ class SettlementPage extends StatelessWidget {
     // 1. 참여자별로 총 지출 계산
     Map<String, int> totalSpent = {for (var p in datas.participants) p: 0};
 
-    for (var expense in datas.expenses) {
-      int splitAmount = (expense.amount / expense.included.length).round();
-      for (var person in expense.included) {
-        totalSpent[person] = (totalSpent[person] ?? 0) - splitAmount;
-      }
-      for (var payer in expense.paidBy) {
-        totalSpent[payer] = (totalSpent[payer] ?? 0) + expense.amount ~/ expense.paidBy.length;
-      }
-    }
+    // for (var expense in datas.expenses) {
+    //   int splitAmount = (expense.amount / expense.included.length).round();
+    //   for (var person in expense.included) {
+    //     totalSpent[person] = (totalSpent[person] ?? 0) - splitAmount;
+    //   }
+    //   for (var payer in expense.paidBy) {
+    //     totalSpent[payer] = (totalSpent[payer] ?? 0) + expense.amount ~/ expense.paidBy.length;
+    //   }
+    // }
 
     // 2. Positive(더 낸 사람)과 Negative(덜 낸 사람) 나누기
     List<MapEntry<String, int>> positive = [];

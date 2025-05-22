@@ -1,72 +1,96 @@
+import 'package:best_settlement_app/viewmodels/expense_viewmodel.dart';
 import 'package:flutter/material.dart';
-import '../models/schedule.dart';
-import '../service/get_json_service.dart';
+import 'package:provider/provider.dart';
+
 import '../service/format.dart';
+import '../service/json_service.dart';
+
+import '../viewmodels/schedule_viewmodel.dart';
+
 import 'detail_page.dart';
 import 'add_schedule_page.dart';
 
-class ListPage extends StatelessWidget {
-  final JsonService jsonService;
-  const ListPage({Key? key, required this.jsonService}) : super(key: key);
+class ListPage extends StatefulWidget {
+  const ListPage({Key? key}) : super(key: key);
+
+  @override
+  State<ListPage> createState() => _ListPageState();
+}
+
+class _ListPageState extends State<ListPage> {
+  /// hive 데이터의 문제로 json데이터를 다시 저장해야하는 경우에만 주석 해제
+  // final JsonService jsonService = JsonService(scheduleViewModel: ScheduleViewModel(), expenseViewModel: ExpenseViewModel());
+  late ScheduleViewModel scheduleViewModel;
+
+  List<Map<String, dynamic>> schedules = [];
+
+  @override
+  void initState() {
+    super.initState();
+    scheduleViewModel = context.read<ScheduleViewModel>();
+    scheduleViewModel.openBox(); // Hive 박스 오픈 및 초기 데이터 로드
+  }
 
   @override
   Widget build(BuildContext context) {
+    /// hive 데이터의 문제로 json데이터를 다시 저장해야하는 경우에만 주석 해제
+    // jsonService.loadSchedules('assets/travel_expenses_updated.json');
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("여행 일정 목록"),
+        title: Text("일정 목록"),
       ),
-      body: FutureBuilder<List<ScheduleModel>>(
-        future: jsonService.loadSchedules('assets/travel_expenses_updated.json'),
-        builder: (context, data) {
-          if (data.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (data.hasError) {
-            return Center(child: Text('데이터를 불러오는 중 오류가 발생했습니다.'));
-          } else if (!data.hasData) {
-            return Center(child: Text('데이터가 없습니다.'));
-          } else {
-            final datas = data.data!;
-            return Stack(
-              children: [
-                ListView.builder(
-                  itemCount: datas.length,
-                  itemBuilder: (context, index) {
-                    final value = datas[index];
-                    return Card(
-                      color: Colors.white,
-                      child: ListTile(
-                        title: Text(value.title),
-                        subtitle: Text('총 사용 금액: ${formatCurrency(value.totalSpent)}'),
-                        onTap: () {
-                          // 클릭 시 상세 페이지로 이동
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetailPage(datas: value),
-                            ),
-                          );
-                        },
+      body: Consumer<ScheduleViewModel>(
+        builder: (context, vm, child) {
+          schedules = vm.schedules.map((e) => e.toJson()).toList();
+
+          if (schedules.isEmpty) {
+            return const Center(child: Text('저장된 일정이 없습니다.'));
+          }
+
+          return ListView.builder(
+            itemCount: schedules.length,
+            itemBuilder: (context, index) {
+              final value = schedules[index];
+
+              return Card(
+                color: Colors.white,
+                child: ListTile(
+                  title: Text(value['title']),
+                  subtitle: Text('총 사용 금액: ${formatCurrency(value['totalExpense'])}'),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(value['date'] ?? '-')
+                    ],
+                  ),
+                  onTap: () {
+                    // 클릭 시 상세 페이지로 이동
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailPage(schedule: vm.schedules[index]),
                       ),
                     );
                   },
                 ),
-                Positioned(
-                  bottom: 20,
-                  right: 20,
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AddSchedulePage()),
-                      );
-                    },
-                    child: Icon(Icons.format_list_bulleted_add, size: 36,),
-                  )
-                )
-              ]
-            );
-          }
-        },
+              );
+            },
+              // Positioned(
+              //   bottom: 20,
+              //   right: 20,
+              //   child: FloatingActionButton(
+              //     onPressed: () {
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(builder: (context) => AddSchedulePage()),
+              //       );
+              //     },
+              //     child: Icon(Icons.format_list_bulleted_add, size: 36,),
+              //   )
+              // )
+          );
+        }
       ),
     );
   }
