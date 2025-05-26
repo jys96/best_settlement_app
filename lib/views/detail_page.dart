@@ -26,12 +26,13 @@ class _DetailPageState extends State<DetailPage> {
   // 지출 항목 추가 이벤트
   void _addExpense(Map<String, dynamic> expense) {
     final lastOrder = expenses.isNotEmpty ? expenses.last['order'] : 0;
+
     expense['order'] = lastOrder + 1;
     expense['scheduleId'] = widget.schedule.id;
 
     setState(() {
       expenses.add(Map<String, Object>.from(expense));
-      expenseViewModel.transExpense(expense);
+      expenseViewModel.transAddExpense(expense);
       ToastUtil.show('항목이 추가되었습니다.');
     });
   }
@@ -46,7 +47,6 @@ class _DetailPageState extends State<DetailPage> {
   @override
   Widget build(BuildContext context) {
     final scheduleId = widget.schedule.id;
-    print('[detail page] schedule ID => ${scheduleId}');
 
     return Scaffold(
       appBar: AppBar(
@@ -102,19 +102,35 @@ class _DetailPageState extends State<DetailPage> {
                   itemCount: expenses.length,
                   itemBuilder: (context, index) {
                     final expense = expenses[index];
+                    final expenseId = expense['id'];
 
-                    return Card(
-                      color: Colors.white,
-                      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                      child: ListTile(
-                        title: Text(expense['title']),
-                        subtitle: Text('금액: ${formatCurrency(expense['amount'])}'),
-                        trailing: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text('결제: ${expense['paidBy'].join(", ")}'),
-                            Text('참여: ${expense['included'].join(", ")}'),
-                          ],
+                    return Dismissible(
+                      key: ValueKey(expenseId),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        color: Colors.red,
+                        child: Icon(Icons.delete, color: Colors.white),
+                      ),
+                      onDismissed: (direction) {
+                        setState(() {
+                          expenseViewModel.deleteExpenseById(scheduleId, expenseId);
+                        });
+                      },
+                      child: Card(
+                        color: Colors.white,
+                        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                        child: ListTile(
+                          title: Text(expense['title']),
+                          subtitle: Text('금액: ${formatCurrency(expense['amount'])}'),
+                          trailing: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text('결제: ${expense['paidBy'].join(", ")}'),
+                              Text('참여: ${expense['included'].join(", ")}'),
+                            ],
+                          ),
                         ),
                       ),
                     );

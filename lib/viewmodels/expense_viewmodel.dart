@@ -19,7 +19,7 @@ class ExpenseViewModel extends ChangeNotifier {
   }
 
   void printExpenses() {
-    loadExpenses(); // 데이터 로드 후
+    loadExpenses();
     for (var expense in _expenses) {
       print(expense);
     }
@@ -32,7 +32,7 @@ class ExpenseViewModel extends ChangeNotifier {
   }
 
   // 모델 타입으로 변환 후 데이터 추가
-  Future<void> transExpense(expense) async {
+  Future<void> transAddExpense(expense) async {
     final transExpense = ExpenseModel.fromJson(expense);
     addExpense(transExpense);
   }
@@ -43,16 +43,44 @@ class ExpenseViewModel extends ChangeNotifier {
     loadExpenses();
   }
 
-  // 데이터 수정
-  Future<void> updateExpense(int index, ExpenseModel expense) async {
-    await _box.putAt(index, expense);
-    loadExpenses();
+  // 데이터 삭제
+  Future<void> deleteExpenseById(String ScheduleId, String expenseId) async {
+    final keyToDelete = _box.keys.firstWhere(
+      (key) => _box.get(key)?.id == expenseId,
+      orElse: () => null,
+    );
+
+    if (keyToDelete != null) {
+      await _box.delete(keyToDelete);
+      await reorderExpensesAfterDeletion(ScheduleId);
+      loadExpenses();
+    }
   }
 
-  // 데이터 삭제
-  Future<void> deleteExpense(int index) async {
-    await _box.deleteAt(index);
-    loadExpenses();
+  // 모든 expense를 order 순서대로 다시 재정렬하는 로직
+  Future<void> reorderExpensesAfterDeletion(String scheduleId) async {
+    // List<ExpenseModel> expenses = _box.values.toList();
+    final expenses = _box.values.where((e) => e.scheduleId == scheduleId).toList();
+    expenses.sort((a, b) => a.order.compareTo(b.order));
+
+    for (int i = 0; i < expenses.length; i++) {
+      ExpenseModel expense = expenses[i];
+
+      if (expense.order != i) {
+        ExpenseModel updated = ExpenseModel(
+          id: expense.id,
+          title: expense.title,
+          amount: expense.amount,
+          paidBy: expense.paidBy,
+          included: expense.included,
+          order: i,
+          scheduleId: expense.scheduleId,
+        );
+
+        final key = _box.keyAt(_box.values.toList().indexOf(expense));
+        await _box.put(key, updated);
+      }
+    }
   }
 
   // 초기화 (모든 데이터 삭제)

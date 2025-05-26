@@ -23,7 +23,7 @@ class ExpenseModel {
   final String scheduleId;
 
   @HiveField(6)
-  final String id;
+  String? id;
 
   ExpenseModel({
     required this.id,
