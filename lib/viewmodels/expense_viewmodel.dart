@@ -31,6 +31,12 @@ class ExpenseViewModel extends ChangeNotifier {
     loadExpenses();
   }
 
+  // 모델 타입으로 변환 후 데이터 추가
+  Future<void> transExpense(expense) async {
+    final transExpense = ExpenseModel.fromJson(expense);
+    addExpense(transExpense);
+  }
+
   // 데이터 추가
   Future<void> addExpense(ExpenseModel expense) async {
     await _box.add(expense);
@@ -49,7 +55,7 @@ class ExpenseViewModel extends ChangeNotifier {
     loadExpenses();
   }
 
-  // 초기화
+  // 초기화 (모든 데이터 삭제)
   Future<void> clearExpenses() async {
     await _box.clear();
     loadExpenses();

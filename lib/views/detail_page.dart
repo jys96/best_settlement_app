@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/schedule.dart';
 import '../service/format.dart';
+import '../service/toast.dart';
 
 import '../viewmodels/expense_viewmodel.dart';
 
@@ -22,11 +23,16 @@ class _DetailPageState extends State<DetailPage> {
 
   List<Map<String, dynamic>> expenses = [];
 
-  /// TODO : 지출 항목 추가 작업
   // 지출 항목 추가 이벤트
   void _addExpense(Map<String, dynamic> expense) {
+    final lastOrder = expenses.isNotEmpty ? expenses.last['order'] : 0;
+    expense['order'] = lastOrder + 1;
+    expense['scheduleId'] = widget.schedule.id;
+
     setState(() {
       expenses.add(Map<String, Object>.from(expense));
+      expenseViewModel.transExpense(expense);
+      ToastUtil.show('항목이 추가되었습니다.');
     });
   }
 
@@ -86,7 +92,6 @@ class _DetailPageState extends State<DetailPage> {
             builder: (context, vm, child) {
               // 지출 항목을 추가할 수 있으므로 전역 변수에 지출내역 저장
               expenses = vm.getExpensesBySchedule(scheduleId).map((e) => e.toJson()).toList();
-              // print('[detail page] expenses => ${expenses}');
 
               if (expenses.isEmpty) {
                 return const Center(child: Text('저장된 지출 항목이 없습니다.'));
@@ -118,24 +123,24 @@ class _DetailPageState extends State<DetailPage> {
               );
             },
           ),
-          // floatingActionButton: FloatingActionButton(
-          //   onPressed: () async {
-          //     await showModalBottomSheet(
-          //       context: context,
-          //       isScrollControlled: true,
-          //       builder: (context) => FractionallySizedBox(
-          //         heightFactor: 0.9,
-          //         child:  AddExpensePage(
-          //           participants: widget.datas.participants,
-          //           onAddExpense: _addExpense,
-          //         )
-          //       ),
-          //     );
-          //   },
-          //   child: Icon(Icons.add, size: 40,),
-          // ),
         ]
-      )
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (context) => FractionallySizedBox(
+              heightFactor: 0.9,
+              child: AddExpensePage(
+                participants: widget.schedule.participants,
+                onAddExpense: _addExpense,
+              )
+            ),
+          );
+        },
+        child: Icon(Icons.add, size: 40),
+      ),
     );
   }
 }
