@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:uuid/uuid.dart';
 import 'dart:convert';
 
 import '../models/schedule.dart';
@@ -44,6 +45,7 @@ class JsonService {
   }
 
   Future<void> saveSchedules(jsonData) async {
+    final uuid = Uuid();
     final schedules = ScheduleModel.fromJson(jsonData);
     await scheduleViewModel.addSchedule(schedules);
 
@@ -52,6 +54,7 @@ class JsonService {
     final List<dynamic> expensesJson = jsonData['expenses'] ?? [];
     // print('[saveSchedules] expensesJson => ${expensesJson}');
     for (var expenseJson in expensesJson) {
+      expenseJson['id'] = uuid.v4();
       expenseJson['scheduleId'] = scheduleId;
       await saveExpense(expenseJson);
     }

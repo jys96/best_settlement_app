@@ -22,7 +22,11 @@ class ExpenseModel {
   @HiveField(5)
   final String scheduleId;
 
+  @HiveField(6)
+  final String id;
+
   ExpenseModel({
+    required this.id,
     required this.title,
     required this.amount,
     required this.paidBy,
@@ -33,11 +37,12 @@ class ExpenseModel {
 
   @override
   String toString() {
-    return 'expense(title: $title, amount: $amount, paidBy: $paidBy, included: $included, order: $order, scheduleId: $scheduleId)';
+    return 'expense(id: $id, title: $title, amount: $amount, paidBy: $paidBy, included: $included, order: $order, scheduleId: $scheduleId)';
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'title': title,
       'amount': amount,
       'paidBy': paidBy,
@@ -50,7 +55,8 @@ class ExpenseModel {
   /// JSON 데이터를 ExpenseModel 객체로 매핑
   factory ExpenseModel.fromJson(Map<String, dynamic> json) {
     return ExpenseModel(
-      title: json['category'],
+      id: json['id'],
+      title: json['title'] ?? json['category'],
       amount: json['amount'],
       paidBy: List<String>.from(json['paidBy']),
       included: List<String>.from(json['included']),

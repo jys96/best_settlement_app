@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+
 import '../service/toast.dart';
 
 class AddExpensePage extends StatefulWidget {
@@ -65,8 +67,11 @@ class _AddExpensePageState extends State<AddExpensePage> {
       return;
     }
 
+    final uuid = Uuid();
+
     final newExpense = {
-      "category": _titleController.text,
+      "id": uuid.v4(),
+      "title": _titleController.text,
       "amount": int.parse(_amountController.text),
       "paidBy": [_selectedPayer],
       "included": _selectedParticipants,
