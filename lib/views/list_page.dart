@@ -1,4 +1,3 @@
-import 'package:best_settlement_app/viewmodels/expense_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -76,6 +75,7 @@ class _ListPageState extends State<ListPage> {
                 ),
               );
             },
+            /// 일정 추가 버튼
               // Positioned(
               //   bottom: 20,
               //   right: 20,

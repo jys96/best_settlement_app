@@ -43,12 +43,13 @@ class ScheduleViewModel extends ChangeNotifier {
     loadSchedules();
   }
 
-  // 초기화
+  // 초기화 (모든 데이터 삭제)
   Future<void> clearSchedule() async {
     await _box.clear();
     loadSchedules();
   }
 
+  // 전체 데이터 확인 (print 이용)
   @override
   String toString() {
     return 'ScheduleViewModel(schedules: $_schedules)';

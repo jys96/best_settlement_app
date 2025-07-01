@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/schedule.dart';
+
 import '../service/format.dart';
 import '../service/toast.dart';
 
@@ -23,7 +24,7 @@ class _DetailPageState extends State<DetailPage> {
 
   List<Map<String, dynamic>> expenses = [];
 
-  // 지출 항목 추가 이벤트
+  /// 지출 항목 추가 이벤트
   void _addExpense(Map<String, dynamic> expense) {
     final lastOrder = expenses.isNotEmpty ? expenses.last['order'] : 0;
 

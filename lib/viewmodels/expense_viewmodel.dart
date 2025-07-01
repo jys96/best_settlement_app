@@ -18,13 +18,6 @@ class ExpenseViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void printExpenses() {
-    loadExpenses();
-    for (var expense in _expenses) {
-      print(expense);
-    }
-  }
-
   // Hive 박스 오픈
   Future<void> openBox() async {
     await Hive.openBox<ExpenseModel>(boxName);
@@ -44,7 +37,7 @@ class ExpenseViewModel extends ChangeNotifier {
   }
 
   // 데이터 삭제
-  Future<void> deleteExpenseById(String ScheduleId, String expenseId) async {
+  Future<void> deleteExpenseById(String scheduleId, String expenseId) async {
     final keyToDelete = _box.keys.firstWhere(
       (key) => _box.get(key)?.id == expenseId,
       orElse: () => null,
@@ -52,7 +45,7 @@ class ExpenseViewModel extends ChangeNotifier {
 
     if (keyToDelete != null) {
       await _box.delete(keyToDelete);
-      await reorderExpensesAfterDeletion(ScheduleId);
+      await reorderExpensesAfterDeletion(scheduleId);
       loadExpenses();
     }
   }
@@ -95,10 +88,17 @@ class ExpenseViewModel extends ChangeNotifier {
                 .where((e) => e.scheduleId == scheduleId)
                 .toList();
   }
-
   // 전체 데이터 확인 (print 이용)
   @override
   String toString() {
     return 'ExpenseViewModel(expenses: $_expenses)';
   }
+
+  void printExpenses() {
+    loadExpenses();
+    for (var expense in _expenses) {
+      print(expense);
+    }
+  }
+
 }

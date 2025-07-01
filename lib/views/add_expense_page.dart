@@ -170,10 +170,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _submitExpense,
-              child: Text('항목 추가'),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 60)
               ),
+              child: Text('항목 추가'),
             ),
           ],
         ),
